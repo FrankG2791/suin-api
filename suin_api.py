@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 from bs4 import BeautifulSoup
+import os  # 👈 MUY IMPORTANTE: debe ir aquí arriba
 
 app = Flask(__name__)
 
@@ -12,7 +13,6 @@ def consultar_documento():
     if not tipo or not id_suin:
         return jsonify({"error": "Parámetros 'tipo' e 'id' son obligatorios"}), 400
 
-    # Construye la URL a SUIN
     suin_url = f"https://www.suin-juriscol.gov.co/viewDocument.asp?ruta={tipo}/{id_suin}"
     suin_response = requests.get(suin_url)
 
@@ -20,9 +20,7 @@ def consultar_documento():
         return jsonify({"error": "Documento no encontrado en SUIN"}), 404
 
     soup = BeautifulSoup(suin_response.content, "html.parser")
-
-    # Extracción básica del contenido legal
-    content_div = soup.find("div", class_="Texto")  # Suele ser esta clase
+    content_div = soup.find("div", class_="Texto")
     texto = content_div.get_text(separator="\n") if content_div else soup.get_text()
 
     return jsonify({
@@ -33,4 +31,5 @@ def consultar_documento():
     })
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

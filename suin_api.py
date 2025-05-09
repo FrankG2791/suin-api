@@ -14,7 +14,7 @@ def consultar_documento():
         return jsonify({"error": "Parámetros 'tipo' e 'id' son obligatorios"}), 400
 
     suin_url = f"https://www.suin-juriscol.gov.co/viewDocument.asp?ruta={tipo}/{id_suin}"
-    suin_response = requests.get(suin_url)
+    suin_response = requests.get(suin_url, verify=False)
 
     if suin_response.status_code != 200:
         return jsonify({"error": "Documento no encontrado en SUIN"}), 404
